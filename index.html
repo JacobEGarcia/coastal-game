@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coastal</title>
+<style>
+:root{--bg:#0b141a;--card:#111e28;--line:#1e3344;--ink:#e0eef5;--dim:#7fa0b3;--accent:#5ec9e8;--sand:#e8d05e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:26px 18px}
+h1{font-size:28px;letter-spacing:10px;color:var(--accent);text-shadow:0 0 24px rgba(94,201,232,.3)}
+.sub{color:var(--dim);font-size:11px;letter-spacing:2.5px;margin-top:6px;text-transform:uppercase}
+#coast{width:min(600px,96vw);height:340px;margin:18px 0;border:1px solid var(--line);border-radius:14px;position:relative;overflow:hidden;background:linear-gradient(#0e2433 0 55%,#c9b37a 55% 62%,#8a7648 62%);}
+#wave{position:absolute;left:0;right:0;top:52%;font-size:20px;letter-spacing:-2px;white-space:nowrap;overflow:hidden;opacity:.8}
+#you{position:absolute;font-size:36px;top:64%;left:44%;transition:left .15s,top .15s}
+.shell{position:absolute;font-size:22px;cursor:pointer;transition:transform .1s}
+.shell:hover{transform:scale(1.4)}
+#hud{font-size:12.5px;color:var(--dim);letter-spacing:1.5px;text-align:center;line-height:2}
+#hud b{color:var(--sand)}
+#msg{margin-top:8px;font-size:12px;color:var(--dim);letter-spacing:1px;min-height:18px;text-align:center}
+</style>
+</head>
+<body>
+<h1>COASTAL</h1>
+<div class="sub">walk the tide line &middot; collect what the sea gives</div>
+<div id="coast">
+  <div id="wave">～～～～～～～～～～～～～～～～～～～～～～～～～～～～～～～～</div>
+  <div id="you">🚶</div>
+</div>
+<div id="hud">SHELLS <b id="shells">0</b> &middot; SEA GLASS <b id="glass">0</b> &middot; MYSTERY ITEMS <b id="myst">0</b></div>
+<div id="msg">click what washes up. the tide provides on its own schedule.</div>
+<script>
+const $=id=>document.getElementById(id);
+const coast=$('coast');
+let shells=0,glass=0,myst=0;
+const FINDS=[['🐚','shell',.5],['🫙','glass',.25],['🦀','mystery',.1],['⭐','mystery',.08],['🗝️','mystery',.04],['💎','mystery',.03]];
+const NOTES={shell:'a shell, still humming',glass:'sea glass, smoothed by patience',mystery:'the sea has questions. you have this now.'};
+setInterval(()=>{
+  if(document.querySelectorAll('.shell').length>6)return;
+  let r=Math.random(),pick=FINDS[0],acc=0;
+  for(const f of FINDS){acc+=f[2];if(r<acc){pick=f;break;}}
+  const el=document.createElement('div');el.className='shell';el.textContent=pick[0];
+  el.style.left=(5+Math.random()*88)+'%';el.style.top=(64+Math.random()*28)+'%';
+  el.onclick=()=>{
+    if(pick[1]==='shell'){shells++;$('shells').textContent=shells;}
+    else if(pick[1]==='glass'){glass++;$('glass').textContent=glass;}
+    else{myst++;$('myst').textContent=myst;}
+    $('msg').textContent=NOTES[pick[1]];
+    el.style.transform='scale(0)';setTimeout(()=>el.remove(),150);
+    if(shells+glass+myst===20)$('msg').textContent='TWENTY TREASURES. The tide nods. You are coastal now.';
+  };
+  coast.appendChild(el);
+  setTimeout(()=>{if(el.parentNode)el.style.opacity='0.3';},8000);
+  setTimeout(()=>el.remove(),12000);
+},1500);
+/* wander */
+let x=44,y=64;
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft')x=Math.max(2,x-4);
+  if(e.key==='ArrowRight')x=Math.min(92,x+4);
+  if(e.key==='ArrowUp')y=Math.max(60,y-3);
+  if(e.key==='ArrowDown')y=Math.min(90,y+3);
+  $('you').style.left=x+'%';$('you').style.top=y+'%';
+});
+</script>
+</body>
+</html>
